@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+import argparse
+import os
+
+def main(args):
+    if not any([args.c, args.l, args.w, args.m]):
+        args.c = args.l = args.w = True
+    if args.c:
+        print(os.path.getsize(args.file), args.file)
+    if args.l:
+        with open(args.file, 'r') as f:
+            print(len(f.readlines()), args.file)
+    if args.w:
+        with open(args.file, 'r') as f:
+            print(len(f.read().split()), args.file)
+    if args.m:
+        with open(args.file, 'rb') as f:
+            contents = f.read().decode('utf-8', 'ignore')
+            print(len(contents), args.file)
+
+    return 0
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="wc tool in python")
+    parser.add_argument('-c', action='store_true', help='Output the number of bytes in the file')
+    parser.add_argument('-l', action='store_true', help='Output the number of lines in the file')
+    parser.add_argument('-w', action='store_true', help='Output the number of words in the file')
+    parser.add_argument('-m', action='store_true', help='Output the number of characters in the file')
+    parser.add_argument('file', type=str, help='The file to count')
+    args = parser.parse_args()
+    main(args)
