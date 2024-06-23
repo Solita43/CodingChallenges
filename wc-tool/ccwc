@@ -8,7 +8,7 @@ def main(args):
 
     contents = file.read()
 
-    file_bytes = len(contents.encode('utf-8'))
+    file_bytes = os.path.getsize(args.file) if args.file else len(contents.encode('utf-8'))
     file_lines = contents.count('\n')
     file_words = len(contents.split())
 
