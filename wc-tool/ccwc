@@ -1,33 +1,35 @@
 #!/usr/bin/env python3
 import argparse
-import os
 import sys
+import io
 
 def main(args):
-    file = open(args.file, 'r') if args.file else sys.stdin
+    isFile = isinstance(args.file, io.BufferedReader)
+    contents = args.file.read()
 
-    contents = file.read()
-
-    file_bytes = os.path.getsize(args.file) if args.file else len(contents.encode('utf-8'))
-    file_lines = contents.count('\n')
     file_words = len(contents.split())
 
+    if isFile:
+        file_bytes = len(contents)
+        file_lines = contents.count(b'\n')
+        file_chars = len(contents.decode('utf-8', 'ignore'))
+
+    else:
+        file_bytes = len(contents.encode('utf-8'))
+        file_lines = contents.count('\n')
+        file_chars = len(contents)
+
     if not any([args.c, args.l, args.w, args.m]):
-        print(file_bytes, file_lines, file_words, args.file if args.file else '')
+        print(file_bytes, file_lines, file_words, args.file.name if isFile else '')
     if args.c:
-        print(file_bytes, args.file if args.file else '')
+        print(file_bytes, args.file.name if isFile else '')
     if args.l:
-        print(file_lines, args.file if args.file else '')
+        print(file_lines, args.file.name if isFile else '')
     if args.w:
-        print(file_words, args.file if args.file else '')
+        print(file_words,args.file.name if isFile else '')
     if args.m:
-        file_chars = len(contents.encode('utf-8').decode('utf-8', 'ignore'))
-        print(file_chars, args.file if args.file else '')
+        print(file_chars, args.file.name if isFile else '')
 
-    if args.file:
-        file.close()
-
-    return 0
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="wc tool in python")
@@ -35,6 +37,6 @@ if __name__ == '__main__':
     parser.add_argument('-l', action='store_true', help='Output the number of lines in the file')
     parser.add_argument('-w', action='store_true', help='Output the number of words in the file')
     parser.add_argument('-m', action='store_true', help='Output the number of characters in the file')
-    parser.add_argument('file', type=str, nargs='?', help='The file to count')
+    parser.add_argument('file', type=argparse.FileType('rb'), nargs='?', default=sys.stdin, help='The file to count')
     args = parser.parse_args()
     main(args)
