@@ -1,22 +1,31 @@
 #!/usr/bin/env python3
 import argparse
 import os
+import sys
 
 def main(args):
+    file = open(args.file, 'r') if args.file else sys.stdin
+
+    contents = file.read()
+
+    file_bytes = len(contents.encode('utf-8'))
+    file_lines = contents.count('\n')
+    file_words = len(contents.split())
+
     if not any([args.c, args.l, args.w, args.m]):
-        args.c = args.l = args.w = True
+        print(file_bytes, file_lines, file_words, args.file if args.file else '')
     if args.c:
-        print(os.path.getsize(args.file), args.file)
+        print(file_bytes, args.file if args.file else '')
     if args.l:
-        with open(args.file, 'r') as f:
-            print(len(f.readlines()), args.file)
+        print(file_lines, args.file if args.file else '')
     if args.w:
-        with open(args.file, 'r') as f:
-            print(len(f.read().split()), args.file)
+        print(file_words, args.file if args.file else '')
     if args.m:
-        with open(args.file, 'rb') as f:
-            contents = f.read().decode('utf-8', 'ignore')
-            print(len(contents), args.file)
+        file_chars = len(contents.encode('utf-8').decode('utf-8', 'ignore'))
+        print(file_chars, args.file if args.file else '')
+
+    if args.file:
+        file.close()
 
     return 0
 
@@ -26,6 +35,6 @@ if __name__ == '__main__':
     parser.add_argument('-l', action='store_true', help='Output the number of lines in the file')
     parser.add_argument('-w', action='store_true', help='Output the number of words in the file')
     parser.add_argument('-m', action='store_true', help='Output the number of characters in the file')
-    parser.add_argument('file', type=str, help='The file to count')
+    parser.add_argument('file', type=str, nargs='?', help='The file to count')
     args = parser.parse_args()
     main(args)
